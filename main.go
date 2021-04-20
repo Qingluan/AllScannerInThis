@@ -21,7 +21,7 @@ func main() {
 	flag.StringVar(&target.Proxy, "proxy", "", "set proxy value")
 
 	flag.Parse()
-
+	common.Info("Scan:", target.ScanClass)
 	switch target.ScanClass {
 	case "admin":
 		admin.ScanMain(target)

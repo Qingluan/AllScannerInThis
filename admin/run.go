@@ -2,8 +2,6 @@ package admin
 
 import (
 	"fmt"
-	"io/ioutil"
-	"os"
 	"runtime"
 	"strings"
 
@@ -15,6 +13,10 @@ import (
 var result []string
 
 func ScanMain(target common.ScanTarget) {
+	common.Info("thread:", target.Num)
+	common.Info("type  :", target.ScanType)
+	common.Info("target:", target.Target)
+
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	// threa := os.Args[2]
 	thread := target.Num
@@ -36,7 +38,7 @@ func ScanMain(target common.ScanTarget) {
 		file = mdb
 	default:
 		file = dirs + "\n" + mdb
-		os.Exit(1)
+		// os.Exit(1)
 	}
 
 	arr := strings.Split(file, "\n")
@@ -55,38 +57,69 @@ func ScanMain(target common.ScanTarget) {
 
 }
 
-func testErrorPage(url, proxy string) (code int, errorPage []byte) {
-	url = url + "/someErrorPage"
+func testErrorPage(url, proxy string) (code int, errorPage string) {
+	// url = url + "/someErrorPageAbabababababababababbababa"
+
 	c, _, page := scandir(url, proxy)
+	common.Info("tset Err Pge:", url, " len:", len(page))
 	return c, page
 }
 
+func J(u, e string) string {
+	e = strings.TrimSpace(e)
+	if strings.HasSuffix(u, "/") {
+		if strings.HasPrefix(e, "/") {
+			return u + e[1:]
+		} else {
+			return u + e
+		}
+	} else {
+		if strings.HasPrefix(e, "/") {
+			return u + e
+		} else {
+			return u + "/" + e
+
+		}
+	}
+}
+
+func ErrPage(url, e string) string {
+	if strings.HasPrefix(e, "/") {
+		e = "asdfdsfasdfaeroerrreea" + e
+	} else {
+		e = "asdfasdffasdgasdgdasgasdgsd/" + e
+	}
+	return J(url, e)
+}
+
 func run(urls string, dir []string, tnum int, task int, ch chan int, proxy string) {
-	_, ErrPage := testErrorPage(urls, proxy)
+	_, ErrHash := testErrorPage(ErrPage(urls, dir[0]), proxy)
+	ai := len(dir)
+	// common.Info("Err Hash:", ErrHash)
 	for i := tnum*task + 1; i < (tnum*task)+task; i++ {
 		dir[i-1] = strings.TrimSpace(dir[i-1])
-		url := urls + dir[i-1]
+		url := J(urls, dir[i-1])
 		if strings.TrimSpace(url) == "" {
 			continue
 		}
-		code, err, buf := scandir(url, proxy)
+		code, err, hash := scandir(url, proxy)
 		if err != nil {
 			continue
 		}
-		if strings.TrimSpace(string(buf)) == strings.TrimSpace(string(ErrPage)) {
+		if hash == ErrHash || len(hash) == 0 {
 			continue
 		}
 		if code == 403 || code == 404 {
-			common.Infor("Checking: ", dir[i-1])
+			common.Infor(fmt.Sprintf("[%d/%d]", i, ai), "Checking: ", dir[i-1])
 		} else {
-			common.Info(fmt.Sprintf("Found: %s [%d]!!!", dir[i-1], code))
+			common.Info(fmt.Sprintf("Found: %s length:%d [%d] !!!", common.Green(J(urls, dir[i-1])), len(hash), code))
 			result = append(result, dir[i-1])
 		}
 	}
 	ch <- 1
 }
 
-func scandir(url string, proxy string) (int, error, []byte) {
+func scandir(url string, proxy string) (int, error, string) {
 	session := jupyter.NewSession()
 	if proxy != "" {
 		dialer := merkur.NewProxyDialer(proxy)
@@ -96,12 +129,16 @@ func scandir(url string, proxy string) (int, error, []byte) {
 	}
 	resp, err := session.Get(url)
 	var status int
-	var page []byte
+	var page string
 	if err != nil {
 		status = 404
+		return status, err, ""
 	} else {
 		status = resp.StatusCode
-		page, err = ioutil.ReadAll(resp.Body)
+		page = resp.Text()
+		// page, err = ioutil.ReadAll(resp.Body)
+
 	}
+	// fmt.Println(url, "----\n---", page)
 	return status, err, page
 }
