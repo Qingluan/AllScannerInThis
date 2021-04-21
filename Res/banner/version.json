@@ -1,0 +1,7 @@
+{
+    "dedecms":{
+        "path":"/data/admin/ver.txt",
+        "option":"re",
+        "content":"2\\d{7}"
+    }
+}

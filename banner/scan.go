@@ -35,6 +35,10 @@ type Arg struct {
 	Wait   int
 }
 
+var (
+	Versions = map[string]Version{}
+)
+
 func ScanMain(target common.ScanTarget) {
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
@@ -45,6 +49,7 @@ func ScanMain(target common.ScanTarget) {
 	okchan := make(chan string)
 	c := 0
 	scanRes := LoadRes()
+	Versions = LoadVersion()
 	ac := len(scanRes)
 	for k, bs := range scanRes {
 		// SCANLOOP:
@@ -120,8 +125,9 @@ func scanBanner(name, target, proxy, errPage string, randomua bool, banners []Ba
 	if Found.Name != "" {
 
 		common.Info(common.Red("*"), common.Yellow("*"), common.Green("* ", Found.Name, " *"), common.Yellow("*"), common.Red("* "), common.Cyan(Found.Content), " in ", common.Blue(Found.Path), " size:", common.Blue(size), "       ")
-		if Found.Ver != nil {
-			ScanVersion(name, target, Found, sess)
+
+		if ver, ok := Versions[Found.Name]; ok {
+			ScanVersion(name, target, ver, sess)
 		}
 		*ifokch <- Found.Path
 	} else {
@@ -130,16 +136,16 @@ func scanBanner(name, target, proxy, errPage string, randomua bool, banners []Ba
 
 }
 
-func ScanVersion(name, target string, banner BannerRes, sess *jupyter.Session) {
-
-	path2 := http.UrlJoin(target, banner.Ver.Path)
+func ScanVersion(name, target string, ver Version, sess *jupyter.Session) {
+	path2 := http.UrlJoin(target, ver.Path)
 	if res, err := sess.Get(path2); err == nil {
-		switch banner.Ver.Option {
+		switch ver.Option {
 		case "re":
-			rec := regexp.MustCompile(banner.Ver.Content)
+			rec := regexp.MustCompile(ver.Content)
 			if version := rec.FindString(string(res.Html())); version != "" {
-				common.Info("  ", name, "Version:", common.Green(version), "          ")
+				common.Info(" ", common.Yellow("└"), common.Green("─ "), ver.Path, " Version: ", common.Green(version), "          ")
 			}
 		}
 	}
+
 }

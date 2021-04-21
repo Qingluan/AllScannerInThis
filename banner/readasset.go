@@ -7,6 +7,24 @@ import (
 	"github.com/Qingluan/AllScannerInThis/asset"
 )
 
+func LoadVersion() map[string]Version {
+	buf, err := asset.Asset("Res/banner/version.json")
+	if err != nil {
+		log.Fatal("load fail:", err)
+	}
+	array := make(map[string]interface{})
+	if err := json.Unmarshal(buf, &array); err != nil {
+		log.Fatal("load json err:", err)
+	}
+	D := make(map[string]Version)
+	for name, buf := range array {
+		buf, _ := json.Marshal(buf)
+		e := Version{}
+		json.Unmarshal(buf, &e)
+		D[name] = e
+	}
+	return D
+}
 func LoadRes() map[string][]BannerRes {
 	buf, err := asset.Asset("Res/banner/banner.json")
 	if err != nil {

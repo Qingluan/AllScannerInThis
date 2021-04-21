@@ -85,7 +85,7 @@
     "/data/admin/allowurl.txt": [
         {
             "option": "re",
-            "name": "DedeCMS(\u7ec7\u68a6)",
+            "name": "dedecms",
             "content": "dedecms"
         },
         {
@@ -102,56 +102,56 @@
     "/data/index.html": [
         {
             "option": "re",
-            "name": "DedeCMS(\u7ec7\u68a6)",
+            "name": "dedecms",
             "content": "dedecms"
         }
     ],
     "/data/js/index.html": [
         {
             "option": "re",
-            "name": "DedeCMS(\u7ec7\u68a6)",
+            "name": "dedecms",
             "content": "dedecms"
         }
     ],
     "/data/mytag/index.html": [
         {
             "option": "re",
-            "name": "DedeCMS(\u7ec7\u68a6)",
+            "name": "dedecms",
             "content": "dedecms"
         }
     ],
     "/data/sessions/index.html": [
         {
             "option": "re",
-            "name": "DedeCMS(\u7ec7\u68a6)",
+            "name": "dedecms",
             "content": "dedecms"
         }
     ],
     "/data/textdata/index.html": [
         {
             "option": "re",
-            "name": "DedeCMS(\u7ec7\u68a6)",
+            "name": "dedecms",
             "content": "dedecms"
         }
     ],
     "/dede/action/css_body.css": [
         {
             "option": "re",
-            "name": "DedeCMS(\u7ec7\u68a6)",
+            "name": "dedecms",
             "content": "dedecms"
         }
     ],
     "/dede/css_body.css": [
         {
             "option": "re",
-            "name": "DedeCMS(\u7ec7\u68a6)",
+            "name": "dedecms",
             "content": "dedecms"
         }
     ],
     "/dede/templets/article_coonepage_rule.htm": [
         {
             "option": "re",
-            "name": "DedeCMS(\u7ec7\u68a6)",
+            "name": "dedecms",
             "content": "dedecms"
         },
         {
@@ -163,14 +163,14 @@
     "/include/alert.htm": [
         {
             "option": "re",
-            "name": "DedeCMS(\u7ec7\u68a6)",
+            "name": "dedecms",
             "content": "dedecms"
         }
     ],
     "/member/images/base.css": [
         {
             "option": "re",
-            "name": "DedeCMS(\u7ec7\u68a6)",
+            "name": "dedecms",
             "content": "dedecms"
         },
         {
@@ -182,42 +182,42 @@
     "/member/js/box.js": [
         {
             "option": "re",
-            "name": "DedeCMS(\u7ec7\u68a6)",
+            "name": "dedecms",
             "content": "dedecms"
         }
     ],
     "/php/modpage/readme.txt": [
         {
             "option": "re",
-            "name": "DedeCMS(\u7ec7\u68a6)",
+            "name": "dedecms",
             "content": "dedecms"
         }
     ],
     "/plus/sitemap.html": [
         {
             "option": "re",
-            "name": "DedeCMS(\u7ec7\u68a6)",
+            "name": "dedecms",
             "content": "dedecms"
         }
     ],
     "/setup/license.html": [
         {
             "option": "re",
-            "name": "DedeCMS(\u7ec7\u68a6)",
+            "name": "dedecms",
             "content": "dedecms"
         }
     ],
     "/special/index.html": [
         {
             "option": "re",
-            "name": "DedeCMS(\u7ec7\u68a6)",
+            "name": "dedecms",
             "content": "dedecms"
         }
     ],
     "/templets/default/style/dedecms.css": [
         {
             "option": "re",
-            "name": "DedeCMS(\u7ec7\u68a6)",
+            "name": "dedecms",
             "content": "dedecms"
         },
         {
@@ -239,7 +239,7 @@
     "/company/template/default/search_list.htm": [
         {
             "option": "re",
-            "name": "DedeCMS(\u7ec7\u68a6)",
+            "name": "dedecms",
             "content": "dedecms"
         }
     ],
