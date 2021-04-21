@@ -8,20 +8,28 @@ import (
 
 var (
 	Green       = color.New(color.FgGreen, color.Bold).SprintFunc()
-	Blue        = color.New(color.FgBlue, color.Bold).SprintfFunc()
-	Yellow      = color.New(color.FgYellow).SprintfFunc()
-	LabelYellow = color.New(color.BgYellow, color.FgWhite, color.Bold).SprintfFunc()
+	Blue        = color.New(color.FgBlue, color.Bold).SprintFunc()
+	Yellow      = color.New(color.FgYellow).SprintFunc()
+	Red         = color.New(color.FgRed).SprintFunc()
+	LabelYellow = color.New(color.BgYellow, color.FgWhite, color.Bold).SprintFunc()
 
 	White = color.New(color.FgWhite, color.Bold).SprintFunc()
 )
 
 func Info(args ...interface{}) {
-	fmt.Printf("%s : %s\r\n", Blue("[*]"), White(args...))
+	fmt.Printf("%s : %s        \r\n", Blue("[*]"), White(args...))
+}
+func InfoOk(args ...interface{}) {
+	fmt.Printf("%s : %s        \r\n", Green("[•]"), White(args...))
 }
 
 func Infor(args ...interface{}) {
 	fmt.Printf("                                                                              \r")
-	fmt.Printf("%s : %s\r", LabelYellow("[.V.]"), White(args...))
+	fmt.Printf("%s : %s\r", Yellow("[*]"), White(args...))
+}
+
+func InfoErr(err error, args ...interface{}) {
+	fmt.Printf("%s : %s        \r\n", Red("[*]"), White(args...), Yellow(err))
 }
 
 // func Infor(args ...interface{}) {
