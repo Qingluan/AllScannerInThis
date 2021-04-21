@@ -1,14 +1,12 @@
 package banner
 
 import (
-	"encoding/json"
 	"fmt"
-	"log"
+	"os"
 	"regexp"
 	"runtime"
 	"strings"
 
-	"github.com/Qingluan/AllScannerInThis/asset"
 	"github.com/Qingluan/AllScannerInThis/common"
 	"github.com/Qingluan/jupyter/http"
 	jupyter "github.com/Qingluan/jupyter/http"
@@ -17,16 +15,18 @@ import (
 
 type Version struct {
 	Path    string `json:"path"`
+	Name    string `json:"name"`
 	Content string `json:"content"`
 	Option  string `json:"option"`
-	Hit     int    `json:"hit"`
+	// Hit     int    `json:"hit"`
 }
 type BannerRes struct {
-	Path    string   `json:"path"`
-	Content string   `json:"content"`
-	Option  string   `json:"option"`
-	Hit     int      `json:"hit"`
-	Ver     *Version `json:"version"`
+	Path    string `json:"path"`
+	Name    string `json:"name"`
+	Content string `json:"content"`
+	Option  string `json:"option"`
+	// Hit     int      `json:"hit"`
+	Ver *Version `json:"version"`
 }
 type Arg struct {
 	Name   string
@@ -36,40 +36,26 @@ type Arg struct {
 }
 
 func ScanMain(target common.ScanTarget) {
-	buf, err := asset.Asset("Res/banner.json")
-	if err != nil {
-		log.Fatal("Load Banner.json failed", err)
-	}
-	scanRes := make(map[string]interface{})
-	if err := json.Unmarshal(buf, &scanRes); err != nil {
-		log.Fatal(err)
-	}
+
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	thread := target.Num
-	// ch := make(chan Arg, thread)
-	// url := target.Target
 	wait := target.Wait
 	ch := make(chan int, thread)
 	errPage := target.TestErrPage()
-	okchan := make(chan int)
+	okchan := make(chan string)
 	c := 0
+	scanRes := LoadRes()
 	ac := len(scanRes)
-	for k, bi := range scanRes {
-	SCANLOOP:
+	for k, bs := range scanRes {
+		// SCANLOOP:
 		select {
-		case <-okchan:
+		case FoundPath := <-okchan:
 			if target.ScanType != "all" {
-				break SCANLOOP
+				common.InfoOk("Not \"all\" mode so break ! check: ", common.Green(http.UrlJoin(target.Target, FoundPath)))
+				os.Exit(0)
 			}
 		default:
-
-			buf, _ := json.Marshal(bi)
-			b := BannerRes{}
-			err := json.Unmarshal(buf, &b)
-			if err != nil {
-				log.Fatal("Trans buf -> Banner :", err, k)
-			}
-			go scanBanner(k, target.Target, target.Proxy, errPage, target.RandomUA, b, c, ac, wait, &okchan, &ch)
+			go scanBanner(k, target.Target, target.Proxy, errPage, target.RandomUA, bs, c, ac, wait, &okchan, &ch)
 			ch <- 1
 			c++
 		}
@@ -77,7 +63,7 @@ func ScanMain(target common.ScanTarget) {
 	// <-ch
 }
 
-func scanBanner(name, target, proxy, errPage string, randomua bool, banner BannerRes, i, ai, wait int, ifokch, ch *chan int) {
+func scanBanner(name, target, proxy, errPage string, randomua bool, banners []BannerRes, i, ai, wait int, ifokch *chan string, ch *chan int) {
 	defer func() { <-*ch }()
 	sess := jupyter.NewSession()
 	if proxy != "" {
@@ -88,21 +74,27 @@ func scanBanner(name, target, proxy, errPage string, randomua bool, banner Banne
 	if randomua {
 		sess.RandomeUA = true
 	}
-	Found := false
-	paths := []string{}
-	if strings.Contains(banner.Path, "|") {
-		for _, path := range strings.Split(banner.Path, "|") {
-			paths = append(paths, http.UrlJoin(target, strings.TrimSpace(path)))
-		}
-	} else {
-		paths = append(paths, http.UrlJoin(target, banner.Path))
+	var Found BannerRes
 
-	}
-	for _, path := range paths {
+	// paths := []string{}
+	// if strings.Contains(banner.Path, "|") {
+	// 	for _, path := range strings.Split(banner.Path, "|") {
+	// 		paths = append(paths, http.UrlJoin(target, strings.TrimSpace(path)))
+	// 	}
+	// } else {
+	// 	paths = append(paths, http.UrlJoin(target, banner.Path))
+
+	// }
+	size := 0
+	for _, banner := range banners {
+		path := http.UrlJoin(target, banner.Path)
 
 		if res, err := sess.Get(path); err != nil {
 
 		} else {
+			if res.StatusCode/100 > 3 {
+				return
+			}
 			if text := res.Text(); text == errPage {
 				return
 			}
@@ -110,24 +102,28 @@ func scanBanner(name, target, proxy, errPage string, randomua bool, banner Banne
 			switch banner.Option {
 			case "keyword":
 				if res.Search(strings.ToLower(banner.Content), true) {
-					Found = true
+					Found = banner
+					size = len(res.Html())
 					break
 				}
 			case "md5":
 				if res.Md5() == banner.Content {
-					Found = true
+					Found = banner
+
+					size = len(res.Html())
 					break
 				}
 			}
 		}
 	}
 
-	if Found {
+	if Found.Name != "" {
 
-		common.Info(common.Green(name), " in ", common.Blue(banner.Path), "       ")
-		if banner.Ver != nil {
-			ScanVersion(name, target, banner, sess)
+		common.Info(common.Red("*"), common.Yellow("*"), common.Green("* ", Found.Name, " *"), common.Yellow("*"), common.Red("* "), common.Cyan(Found.Content), " in ", common.Blue(Found.Path), " size:", common.Blue(size), "       ")
+		if Found.Ver != nil {
+			ScanVersion(name, target, Found, sess)
 		}
+		*ifokch <- Found.Path
 	} else {
 		common.Infor(fmt.Sprintf("[%5d/%5d] Checking : %s", i, ai, name))
 	}

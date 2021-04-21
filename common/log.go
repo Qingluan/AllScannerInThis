@@ -11,6 +11,7 @@ var (
 	Blue        = color.New(color.FgBlue, color.Bold).SprintFunc()
 	Yellow      = color.New(color.FgYellow).SprintFunc()
 	Red         = color.New(color.FgRed).SprintFunc()
+	Cyan        = color.New(color.FgCyan).SprintFunc()
 	LabelYellow = color.New(color.BgYellow, color.FgWhite, color.Bold).SprintFunc()
 
 	White = color.New(color.FgWhite, color.Bold).SprintFunc()
