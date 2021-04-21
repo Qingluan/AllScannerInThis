@@ -1,6 +1,8 @@
 package common
 
 import (
+	"strings"
+
 	"github.com/Qingluan/jupyter/http"
 	jupyter "github.com/Qingluan/jupyter/http"
 	"github.com/Qingluan/merkur"
@@ -61,6 +63,8 @@ func (scan *Scaner) scan(name, path, errPage string, target ScanTarget, chs, bre
 		}
 		Infor("Check: ", url)
 	} else {
-		InfoErr(err, url)
+		if strings.Contains(err.Error(), "too many open files") {
+			InfoErr(err, url)
+		}
 	}
 }

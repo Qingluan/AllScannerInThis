@@ -119,6 +119,14 @@ func scanBanner(name, target, proxy, errPage string, randomua bool, banners []Ba
 					res.Body.Close()
 					break
 				}
+			case "re":
+				rec := regexp.MustCompile(banner.Content)
+				if version := rec.FindString(string(res.Html())); version != "" {
+					Found = banner
+					size = len(res.Html())
+					res.Body.Close()
+					break
+				}
 			case "md5":
 				if res.Md5() == banner.Content {
 					Found = banner
