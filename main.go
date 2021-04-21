@@ -2,11 +2,14 @@ package main
 
 import (
 	"flag"
+	"log"
 
 	"github.com/Qingluan/AllScannerInThis/admin"
 	"github.com/Qingluan/AllScannerInThis/banner"
 	"github.com/Qingluan/AllScannerInThis/common"
 	"github.com/Qingluan/AllScannerInThis/dir"
+	"github.com/Qingluan/jupyter/http"
+	"github.com/Qingluan/merkur"
 )
 
 var (
@@ -31,5 +34,17 @@ func main() {
 		dir.ScanMain(target)
 	case "banner":
 		banner.ScanMain(target)
+	case "md5":
+		sess := http.NewSession()
+		if target.Proxy != "" {
+			sess.SetProxyDialer(merkur.NewProxyDialer(target.Proxy))
+		}
+		sess.RandomeUA = target.RandomUA
+		if res, err := sess.Get(target.Target); err != nil {
+			log.Fatal(err)
+		} else {
+			common.InfoOk("md5: ", common.Green(res.Md5()))
+		}
+
 	}
 }

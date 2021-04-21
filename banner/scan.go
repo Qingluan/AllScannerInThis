@@ -95,12 +95,19 @@ func scanBanner(name, target, proxy, errPage string, randomua bool, banners []Ba
 		path := http.UrlJoin(target, banner.Path)
 
 		if res, err := sess.Get(path); err != nil {
+			if strings.Contains(err.Error(), "too many open files") {
+				common.InfoErr(err, path)
+			}
 
 		} else {
+
 			if res.StatusCode/100 > 3 {
+				res.Body.Close()
 				return
 			}
 			if text := res.Text(); text == errPage {
+
+				res.Body.Close()
 				return
 			}
 
@@ -109,6 +116,7 @@ func scanBanner(name, target, proxy, errPage string, randomua bool, banners []Ba
 				if res.Search(strings.ToLower(banner.Content), true) {
 					Found = banner
 					size = len(res.Html())
+					res.Body.Close()
 					break
 				}
 			case "md5":
@@ -116,6 +124,7 @@ func scanBanner(name, target, proxy, errPage string, randomua bool, banners []Ba
 					Found = banner
 
 					size = len(res.Html())
+					res.Body.Close()
 					break
 				}
 			}
