@@ -17,7 +17,7 @@ func ScanMain(target common.ScanTarget) {
 	scanner := common.NewScanner(target, bSource)
 	scanner.Scan(func(name string, target common.ScanTarget, resp *http.SmartResponse) bool {
 		if resp.StatusCode/100 < 4 {
-			common.InfoOk("Found :", common.Green(name), "Size:", common.Blue(len(resp.Html())))
+			common.InfoOk("Found :", common.Green(name), "Size:", common.Blue(len(resp.Html())), "MD5:", common.Yellow(resp.Md5()))
 		}
 		return false
 	})
